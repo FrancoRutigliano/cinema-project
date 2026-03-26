@@ -1,8 +1,11 @@
 package booking
 
 type Service struct {
+	store BookingStore
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(store BookingStore) *Service {
+	return &Service{
+		store: store,
+	}
 }
