@@ -14,6 +14,9 @@ func NewConcurrentStore() *ConcurrentStore {
 }
 
 func (m *ConcurrentStore) Book(book Booking) error {
+	m.Lock()
+	defer m.Unlock()
+
 	if _, exists := m.bookings[book.SeatID]; exists {
 		return ErrSeatAlreadyTaken
 	}
