@@ -20,6 +20,12 @@ func (m *MemoryStore) Book(book Booking) error {
 	return nil
 }
 
-func (m *MemoryStore) ListBookings(movieID string) []Booking {
-	return nil
+func (m *MemoryStore) ListBookingsByMovie(movieID string) []Booking {
+	var result []Booking
+	for _, booking := range m.bookings {
+		if booking.MovieID == movieID {
+			result = append(result, booking)
+		}
+	}
+	return result
 }
