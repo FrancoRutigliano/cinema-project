@@ -11,6 +11,11 @@ func NewMemoryStore() *MemoryStore {
 }
 
 func (m *MemoryStore) Book(book Booking) error {
+	if _, exists := m.bookings[book.SeatID]; exists {
+		return ErrSeatAlreadyTaken
+	}
+
+	m.bookings[book.SeatID] = book
 
 	return nil
 }
