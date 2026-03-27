@@ -30,7 +30,7 @@ func sessionKey(id string) string {
 	return fmt.Sprintf("session:%s", id)
 }
 
-func (r *RedisStore) ListBookingsByMovie(movieID string) []Booking {
+func (r *RedisStore) ListBookingsByMovie(movieID string) ([]Booking, error) {
 	pattern := fmt.Sprintf("seat:%s:*", movieID)
 	var sessions []Booking
 
@@ -40,16 +40,21 @@ func (r *RedisStore) ListBookingsByMovie(movieID string) []Booking {
 	for iter.Next(ctx) {
 		val, err := r.rdb.Get(ctx, iter.Val()).Result()
 		if err != nil {
-			continue
+			return nil, fmt.Errorf("getting key %s: %w", iter.Val(), err)
 		}
 		session, err := parseSession(val)
 		if err != nil {
-			continue
+			return nil, fmt.Errorf("parsing session %s: %w", iter.Val(), err)
 		}
 		sessions = append(sessions, session)
 	}
 
-	return sessions
+	// error del iterator en sí (ej: Redis se cayó a mitad del scan)
+	if err := iter.Err(); err != nil {
+		return nil, fmt.Errorf("scanning keys: %w", err)
+	}
+
+	return sessions, nil
 }
 
 func (r *RedisStore) Book(book Booking) error {
