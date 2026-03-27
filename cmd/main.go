@@ -28,7 +28,7 @@ func main() {
 
 	mux.HandleFunc("GET /movies/{movieID}/seats", handler.ListSeats)
 
-	mux.HandleFunc("POST /movies/{movieID}/seats/{seatID}", handler.HoldSeats)
+	mux.HandleFunc("POST /movies/{movieID}/seats/{seatID}/hold", handler.HoldSeats)
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatalf("shutdown server: %v", err)
