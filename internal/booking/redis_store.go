@@ -100,6 +100,25 @@ func (r *RedisStore) hold(book Booking) (Booking, error) {
 	}, nil
 }
 
+func (s *RedisStore) getSession(ctx context.Context, sessionID string, userID string) (Booking, string, error) {
+	sk, err := s.rdb.Get(ctx, sessionKey(sessionID)).Result()
+	if err != nil {
+		return Booking{}, "", err
+	}
+
+	val, err := s.rdb.Get(ctx, sk).Result()
+	if err != nil {
+		return Booking{}, "", err
+	}
+
+	session, err := parseSession(val)
+	if err != nil {
+		return Booking{}, "", err
+	}
+
+	return session, sk, nil
+}
+
 func parseSession(val string) (Booking, error) {
 	var data Booking
 	if err := json.Unmarshal([]byte(val), &data); err != nil {
