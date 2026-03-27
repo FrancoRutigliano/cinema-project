@@ -30,6 +30,28 @@ func sessionKey(id string) string {
 	return fmt.Sprintf("session:%s", id)
 }
 
+func (r *RedisStore) ListBookings(movieID string) []Booking {
+	pattern := fmt.Sprintf("seat:%s:*", movieID)
+	var sessions []Booking
+
+	ctx := context.Background()
+
+	iter := r.rdb.Scan(ctx, 0, pattern, 0).Iterator()
+	for iter.Next(ctx) {
+		val, err := r.rdb.Get(ctx, iter.Val()).Result()
+		if err != nil {
+			continue
+		}
+		session, err := parseSession(val)
+		if err != nil {
+			continue
+		}
+		sessions = append(sessions, session)
+	}
+
+	return sessions
+}
+
 func (r *RedisStore) hold(book Booking) (Booking, error) {
 	id := uuid.New().String()
 	now := time.Now()
