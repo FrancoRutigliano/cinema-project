@@ -23,3 +23,7 @@ func (s *Service) ListBookingsByMovie(movieID string) ([]Booking, error) {
 func (s *Service) ConfirmSeat(ctx context.Context, sessionID string, userID string) (Booking, error) {
 	return s.store.Confirm(ctx, sessionID, userID)
 }
+
+func (s *Service) ReleaseSet(ctx context.Context, sessionID string, userID string) error {
+	return s.store.Release(ctx, sessionID, userID)
+}
