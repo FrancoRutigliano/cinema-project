@@ -30,7 +30,7 @@ func sessionKey(id string) string {
 	return fmt.Sprintf("session:%s", id)
 }
 
-func (r *RedisStore) ListBookings(movieID string) []Booking {
+func (r *RedisStore) ListBookingsByMovie(movieID string) []Booking {
 	pattern := fmt.Sprintf("seat:%s:*", movieID)
 	var sessions []Booking
 
