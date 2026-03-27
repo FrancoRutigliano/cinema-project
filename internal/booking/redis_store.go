@@ -78,6 +78,21 @@ func (r *RedisStore) Confirm(ctx context.Context, sessionID string, userID strin
 	r.rdb.Persist(ctx, sessionKey(sessionID))
 
 	session.Status = StatusConfirmed
+	data := Booking{
+		ID:      session.ID,
+		MovieID: string(session.MovieID),
+		SeatID:  session.SeatID,
+		UserID:  session.UserID,
+		Status:  StatusConfirmed,
+	}
+
+	val, err := json.Marshal(&data)
+	if err != nil {
+		return Booking{}, fmt.Errorf("confirm marshal: %v", err)
+	}
+
+	r.rdb.Set(ctx, seatKey, val, 0)
+
 	return session, nil
 }
 
