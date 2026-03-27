@@ -88,7 +88,7 @@ func (h *handler) ConfirmSession(w http.ResponseWriter, r *http.Request) {
 
 	if req.UserID == "" {
 		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{
-			Error: fmt.Sprintf("invalid request body: %w", ErrMissingUserID),
+			Error: fmt.Sprintf("invalid request body: %v", ErrMissingUserID),
 		})
 		return
 	}
