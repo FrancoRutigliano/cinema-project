@@ -52,6 +52,10 @@ func (r *RedisStore) ListBookingsByMovie(movieID string) []Booking {
 	return sessions
 }
 
+func (r *RedisStore) Book(book Booking) error {
+	return nil
+}
+
 func (r *RedisStore) hold(book Booking) (Booking, error) {
 	id := uuid.New().String()
 	now := time.Now()
