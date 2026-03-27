@@ -24,12 +24,18 @@ func (h *handler) HoldSeats(w http.ResponseWriter, r *http.Request) {
 	var req holdRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{
-			Error: fmt.Sprintf("invalid request body: %w", err),
+			Error: fmt.Sprintf("invalid request body: %v", err),
 		})
 		return
 	}
 
-	h.svc.store.Book(Booking{})
+	data := Booking{
+		UserID:  req.UserID,
+		SeatID:  seatID,
+		MovieID: movieID,
+	}
+
+	h.svc.store.Book(data)
 }
 
 func (h *handler) ListSeats(w http.ResponseWriter, r *http.Request) {
