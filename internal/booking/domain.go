@@ -3,7 +3,8 @@ package booking
 import "time"
 
 const (
-	StatusHeld = "held"
+	StatusHeld      = "held"
+	StatusConfirmed = "confirmed"
 )
 
 // Booking representa una reserva de asiento.
