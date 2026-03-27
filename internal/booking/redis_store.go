@@ -169,3 +169,13 @@ func parseSession(val string) (Booking, error) {
 		Status:  data.Status,
 	}, nil
 }
+
+func (r *RedisStore) Release(ctx context.Context, sessionID string, userID string) error {
+	_, seatKey, err := r.getSession(ctx, sessionID, userID)
+	if err != nil {
+		return fmt.Errorf("release get session: %v", err)
+	}
+
+	r.rdb.Del(ctx, seatKey, sessionKey(sessionID))
+	return nil
+}
