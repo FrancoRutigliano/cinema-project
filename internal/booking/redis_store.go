@@ -118,7 +118,9 @@ func (r *RedisStore) hold(book Booking) (Booking, error) {
 		return Booking{}, ErrSeatAlreadyTaken
 	}
 
-	r.rdb.Set(ctx, sessionKey(key), value, defaultHoldTTL)
+	// Guarda el reverse-lookup: session:<uuid> → seat key
+	// Permite que getSession encuentre la seat key a partir del sessionID.
+	r.rdb.Set(ctx, sessionKey(id), key, defaultHoldTTL)
 
 	return Booking{
 		ID:        id,
