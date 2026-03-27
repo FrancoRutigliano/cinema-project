@@ -15,6 +15,10 @@ func NewHandler(svc *Service) *handler {
 	}
 }
 
+func (h *handler) HoldSeats(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func (h *handler) ListSeats(w http.ResponseWriter, r *http.Request) {
 	movieID := r.PathValue("movieID")
 
