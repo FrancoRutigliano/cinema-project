@@ -66,6 +66,21 @@ func (r *RedisStore) Book(book Booking) (Booking, error) {
 	return session, nil
 }
 
+func (r *RedisStore) Confirm(ctx context.Context, sessionID string, userID string) (Booking, error) {
+	session, seatKey, err := r.getSession(ctx, sessionID, userID)
+	if err != nil {
+		return Booking{}, err
+	}
+
+	// Quita el TTL de ambas keys: la seat key y el reverse-lookup de sesión
+	// quedan permanentes en Redis (la reserva ya no expira).
+	r.rdb.Persist(ctx, seatKey)
+	r.rdb.Persist(ctx, sessionKey(sessionID))
+
+	session.Status = StatusConfirmed
+	return session, nil
+}
+
 func (r *RedisStore) hold(book Booking) (Booking, error) {
 	id := uuid.New().String()
 	now := time.Now()
@@ -100,23 +115,30 @@ func (r *RedisStore) hold(book Booking) (Booking, error) {
 	}, nil
 }
 
+// getSession hace un reverse-lookup: usa el sessionID para obtener la seat key
+// (session:<sessionID> → seat:<movieID>:<seatID>), luego lee el valor de esa
+// seat key y lo deserializa en un Booking. Devuelve el Booking y la seat key
+// para que el caller pueda operar directamente sobre ella (ej: Persist, Del).
 func (s *RedisStore) getSession(ctx context.Context, sessionID string, userID string) (Booking, string, error) {
-	sk, err := s.rdb.Get(ctx, sessionKey(sessionID)).Result()
+	// Obtiene la seat key asociada al sessionID via el índice inverso.
+	seatKey, err := s.rdb.Get(ctx, sessionKey(sessionID)).Result()
 	if err != nil {
 		return Booking{}, "", fmt.Errorf("getting session key %s: %w", sessionID, err)
 	}
 
-	val, err := s.rdb.Get(ctx, sk).Result()
+	// Lee el valor de la seat key para obtener los datos de la reserva.
+	val, err := s.rdb.Get(ctx, seatKey).Result()
 	if err != nil {
-		return Booking{}, "", fmt.Errorf("getting seat key %s: %w", sk, err)
+		return Booking{}, "", fmt.Errorf("getting seat key %s: %w", seatKey, err)
 	}
 
+	// Deserializa el JSON almacenado en un Booking.
 	session, err := parseSession(val)
 	if err != nil {
 		return Booking{}, "", fmt.Errorf("parsing session %s: %w", sessionID, err)
 	}
 
-	return session, sk, nil
+	return session, seatKey, nil
 }
 
 func parseSession(val string) (Booking, error) {
