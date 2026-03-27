@@ -57,8 +57,13 @@ func (r *RedisStore) ListBookingsByMovie(movieID string) ([]Booking, error) {
 	return sessions, nil
 }
 
-func (r *RedisStore) Book(book Booking) error {
-	return nil
+func (r *RedisStore) Book(book Booking) (Booking, error) {
+	session, err := r.hold(book)
+	if err != nil {
+		return Booking{}, err
+	}
+
+	return session, nil
 }
 
 func (r *RedisStore) hold(book Booking) (Booking, error) {
