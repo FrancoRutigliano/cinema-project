@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type handler struct {
@@ -35,7 +36,20 @@ func (h *handler) HoldSeats(w http.ResponseWriter, r *http.Request) {
 		MovieID: movieID,
 	}
 
-	h.svc.store.Book(data)
+	session, err := h.svc.store.Book(data)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, holdResponse{
+		SeatID:    seatID,
+		MovieID:   session.MovieID,
+		SessionID: session.ID,
+		ExpiresAt: session.ExpiresAt.Format(time.RFC3339),
+	})
 }
 
 func (h *handler) ListSeats(w http.ResponseWriter, r *http.Request) {
