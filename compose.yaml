@@ -1,4 +1,12 @@
 services:
+  app:
+    container_name: cinema-app
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
   redis:
     container_name: redis
     image: redis:7-alpine
