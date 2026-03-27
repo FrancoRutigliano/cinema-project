@@ -6,6 +6,7 @@ import (
 	"booking-concurrent/internal/utils"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -15,8 +16,11 @@ func main() {
 
 	mux.Handle("GET /", http.FileServer(http.Dir("static")))
 
-	store := booking.NewRedisStore(redis.NewClient(
-		"localhost:6379"))
+	redisAddr := os.Getenv("REDIS_ADDR")
+	if redisAddr == "" {
+		redisAddr = "localhost:6379"
+	}
+	store := booking.NewRedisStore(redis.NewClient(redisAddr))
 
 	svc := booking.NewService(store)
 
