@@ -5,3 +5,7 @@ type seatInfo struct {
 	UserID string `json:"user_id"`
 	Booked bool   `json:"booked"`
 }
+
+type holdRequest struct {
+	UserID string `json:"user_id"`
+}
