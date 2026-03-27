@@ -9,3 +9,10 @@ type seatInfo struct {
 type holdRequest struct {
 	UserID string `json:"user_id"`
 }
+
+type holdResponse struct {
+	SessionID string `json:"session_id"`
+	MovieID   string `json:"movie_id"`
+	SeatID    string `json:"seat_id"`
+	ExpiresAt string `json:"expires_at"`
+}
