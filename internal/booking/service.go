@@ -13,3 +13,7 @@ func NewService(store BookingStore) *Service {
 func (s *Service) Book(book Booking) error {
 	return s.store.Book(book)
 }
+
+func (s *Service) ListBookingsByMovie(movieID string) ([]Booking, error) {
+	return s.store.ListBookingsByMovie(movieID)
+}
