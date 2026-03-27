@@ -23,8 +23,8 @@ func (h *handler) HoldSeats(w http.ResponseWriter, r *http.Request) {
 
 	var req holdRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{
-			Error: fmt.Sprintf("decoder failed: %w", err),
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{
+			Error: fmt.Sprintf("invalid request body: %w", err),
 		})
 		return
 	}
