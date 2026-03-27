@@ -74,3 +74,9 @@ func (h *handler) ListSeats(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteJSON(w, http.StatusOK, seats)
 }
+
+func (h *handler) ConfirmSession(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (h *handler) ReleaseSession(w http.ResponseWriter, r *http.Request)

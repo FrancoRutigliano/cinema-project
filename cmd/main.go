@@ -30,6 +30,9 @@ func main() {
 
 	mux.HandleFunc("POST /movies/{movieID}/seats/{seatID}/hold", handler.HoldSeats)
 
+	mux.HandleFunc("PUT /sessions/{sessionID}/confirm", handler.ConfirmSession)
+	mux.HandleFunc("DELETE /sessions/{sessionID}", handler.ReleaseSession)
+
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatalf("shutdown server: %v", err)
 	}
