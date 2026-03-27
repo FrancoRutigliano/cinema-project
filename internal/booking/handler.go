@@ -92,6 +92,22 @@ func (h *handler) ConfirmSession(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	session, err := h.svc.store.Confirm(r.Context(), sessionID, req.UserID)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, sessionResponse{
+		SessionID: session.ID,
+		MovieID:   session.MovieID,
+		SeatID:    session.SeatID,
+		UserID:    req.UserID,
+		Status:    session.Status,
+	})
 }
 
 func (h *handler) ReleaseSession(w http.ResponseWriter, r *http.Request)
