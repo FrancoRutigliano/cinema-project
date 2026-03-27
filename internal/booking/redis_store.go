@@ -103,17 +103,17 @@ func (r *RedisStore) hold(book Booking) (Booking, error) {
 func (s *RedisStore) getSession(ctx context.Context, sessionID string, userID string) (Booking, string, error) {
 	sk, err := s.rdb.Get(ctx, sessionKey(sessionID)).Result()
 	if err != nil {
-		return Booking{}, "", err
+		return Booking{}, "", fmt.Errorf("getting session key %s: %w", sessionID, err)
 	}
 
 	val, err := s.rdb.Get(ctx, sk).Result()
 	if err != nil {
-		return Booking{}, "", err
+		return Booking{}, "", fmt.Errorf("getting seat key %s: %w", sk, err)
 	}
 
 	session, err := parseSession(val)
 	if err != nil {
-		return Booking{}, "", err
+		return Booking{}, "", fmt.Errorf("parsing session %s: %w", sessionID, err)
 	}
 
 	return session, sk, nil
