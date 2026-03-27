@@ -110,4 +110,31 @@ func (h *handler) ConfirmSession(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *handler) ReleaseSession(w http.ResponseWriter, r *http.Request)
+func (h *handler) ReleaseSession(w http.ResponseWriter, r *http.Request) {
+	sessionID := r.PathValue("sessionID")
+
+	var req holdRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{
+			Error: fmt.Sprintf("invalid request body: %v", err),
+		})
+		return
+	}
+
+	if req.UserID == "" {
+		utils.WriteJSON(w, http.StatusBadRequest, ErrorResponse{
+			Error: fmt.Sprintf("invalid request body: %v", ErrMissingUserID),
+		})
+		return
+	}
+
+	err := h.svc.store.Release(r.Context(), sessionID, req.UserID)
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
